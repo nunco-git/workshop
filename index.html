@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>행사코스 나눔터</title>
+<style>
+:root{--bg:#f2f3f5;--card:#fff;--line:#e3e5e8;--text:#1f2328;--muted:#6b7280;--or:#f59e0b;--gr:#10b981;--bl:#3b82f6;--pri:#2563eb;--danger:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;font-size:15px;line-height:1.5}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.strip{display:flex;height:5px}.strip i{flex:1}.strip i:nth-child(1){background:var(--or)}.strip i:nth-child(2){background:var(--gr)}.strip i:nth-child(3){background:var(--bl)}
+.hwrap{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:18px;margin-right:8px}
+nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav button{border:0;background:none;padding:8px 12px;border-radius:8px;font:inherit;cursor:pointer;color:var(--muted)}
+nav button.on{background:#eef4ff;color:var(--pri);font-weight:700}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+.btn:hover{background:#f7f8fa}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.btn.pri:hover{background:#1d4fd8}
+.btn.dan{color:var(--danger);border-color:#f3c4c4}
+.btn.sm{padding:4px 8px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{font:inherit;border:1px solid #cfd3d9;border-radius:8px;padding:8px;width:100%;background:#fff}
+textarea{min-height:70px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.filters{grid-template-columns:repeat(6,1fr)}
+@media(max-width:800px){.g3,.g4,.filters{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.g2,.g3,.g4,.filters{grid-template-columns:1fr}}
+.muted{color:var(--muted)}.small{font-size:13px}.star{color:#d97706;font-weight:700}
+.list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:700px){.list{grid-template-columns:1fr}}
+.cc{cursor:pointer;display:flex;gap:12px;margin:0}
+.cc:hover{border-color:var(--bl)}
+.thumb{width:92px;height:92px;border-radius:8px;object-fit:cover;background:#eceef1;flex:none}
+.chip{display:inline-block;background:#f1f3f5;border-radius:999px;padding:1px 8px;font-size:12px;margin:2px 3px 0 0}
+.chip.meal{background:#fff1d6}.chip.place{background:#dcf5ea}.chip.stay{background:#e1ecff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sp{flex:1}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px 10px}
+.sheet{background:#fff;border-radius:14px;max-width:860px;width:100%;padding:20px;position:relative}
+.sheet.narrow{max-width:420px;margin-top:8vh}
+.x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:22px;cursor:pointer}
+.tl{border-left:3px solid var(--bl);margin:8px 0 8px 8px;padding-left:14px}
+.tl .st{margin-bottom:12px;position:relative}
+.tl .st:before{content:"";position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--bl)}
+.stopbox{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fafbfc}
+#map{height:320px;border-radius:10px;border:1px solid var(--line);margin:8px 0}
+.mk{width:26px;height:26px;border-radius:50%;background:var(--pri);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.photos{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.photos img{width:120px;height:90px;object-fit:cover;border-radius:8px}
+.pv{position:relative}.pv button{position:absolute;right:2px;top:2px;border:0;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer}
+.banner{background:#fff7e0;border:1px solid #f3d98b;border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;z-index:99;display:none;max-width:90vw}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{background:#f5f6f8}
+pre{background:#f5f6f8;padding:10px;border-radius:8px;overflow:auto;font-size:12px}
+@media print{
+  header,#view,.toast,.noprint,.x{display:none!important}
+  body{background:#fff}
+  .ov{position:static;background:none;padding:0;display:block}
+  .sheet{max-width:none;padding:0;border-radius:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="strip"><i></i><i></i><i></i></div>
+  <div class="hwrap">
+    <div class="logo">🚌 행사코스 나눔터</div>
+    <nav id="nav"></nav>
+    <div id="auth"></div>
+  </div>
+</header>
+<main id="view"></main>
+<div id="modal"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,addDoc,query,orderBy,limit,where,serverTimestamp,runTransaction,increment} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+/* ================= 설정 (여기만 고치세요) ================= */
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+const NAVER_MAP_KEY_ID = "bgg27fnbf8";                // 맵마커 앱과 동일한 NCP Maps Client ID
+const ALLOWED_DOMAINS  = ["go.kr","korea.kr","ac.kr","or.kr","sc.kr","es.kr","ms.kr","hs.kr","re.kr"]; // 쓰기 허용 이메일 도메인 (규칙 파일과 동일하게)
+const ADMIN_EMAILS     = [];                          // 관리자 이메일 (규칙 파일과 동일하게)
+/* ========================================================== */
+
+const SIDO=["서울","부산","대구","인천","광주","대전","울산","세종","경기","강원","충북","충남","전북","전남","경북","경남","제주"];
+const TYPES=["방문지","식당","숙소","이동","기타"];
+const RATED=["방문지","식당","숙소"];
+const TRIPS=["당일","1박2일","2박3일"];
+const CONFIGURED=!FIREBASE_CONFIG.apiKey.startsWith("YOUR_");
+const NAVER_CFG=!NAVER_MAP_KEY_ID.startsWith("YOUR_");
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const won=n=>(Number(n)||0).toLocaleString("ko-KR")+"원";
+const toast=(m,ms=2600)=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",ms)};
+const chipCls=t=>t==="식당"?"meal":t==="방문지"?"place":t==="숙소"?"stay":"";
+const safeUrl=u=>/^https:\/\//.test(u||"")?u:"";
+const domainOk=e=>{e=(e||"").toLowerCase();const at=e.lastIndexOf("@");if(at<0)return false;const d=e.slice(at+1);return ALLOWED_DOMAINS.some(a=>d===a||d.endsWith("."+a))};
+const stars=(a,n)=>n?`<span class="star">★ ${a.toFixed(1)}</span> <span class="muted small">(${n})</span>`:`<span class="muted small">평가 없음</span>`;
+const costPP=stops=>(stops||[]).reduce((s,x)=>s+(Number(x.cost)||0),0);
+
+const S={user:null,view:"find",courses:[],plans:[],reports:[],f:{sido:"",q:"",n:"",trip:"",max:"",minr:"",sort:"new"},shown:30,ed:null,lastOrg:localStorage.getItem("lastOrg")||""};
+let app,auth,db,st;
+const isAdmin=()=>S.user&&S.user.emailVerified&&ADMIN_EMAILS.includes((S.user.email||"").toLowerCase());
+const canWrite=()=>S.user&&S.user.emailVerified&&domainOk(S.user.email);
+
+/* ---------- 네이버 지도 ---------- */
+let NAVER_OK=false;
+function loadNaver(){
+  if(!NAVER_CFG)return Promise.resolve(false);
+  window.navermap_authFailure=()=>{NAVER_OK=false;toast("네이버 지도 인증 실패: 허용 도메인(Web 서비스 URL)을 확인하세요",5000)};
+  return new Promise(res=>{
+    const s=document.createElement("script");
+    s.src=`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(NAVER_MAP_KEY_ID)}&submodules=geocoder`;
+    s.onerror=()=>res(false);
+    s.onload=()=>{let n=0;const t=setInterval(()=>{if(window.naver&&naver.maps&&naver.maps.Service){clearInterval(t);NAVER_OK=true;res(true)}else if(++n>50){clearInterval(t);res(!!(window.naver&&naver.maps))}},100)};
+    document.head.appendChild(s);
+  });
+}
+const geoCache={};
+function geocode(addr){
+  return new Promise(res=>{
+    if(!addr)return res(null);
+    if(geoCache[addr]!==undefined)return res(geoCache[addr]);
+    if(!(window.naver&&naver.maps&&naver.maps.Service))return res(null);
+    let done=false;const to=setTimeout(()=>{if(!done){done=true;res(null)}},4000);
+    naver.maps.Service.geocode({query:addr},(status,r)=>{
+      if(done)return;done=true;clearTimeout(to);
+      const a=status===naver.maps.Service.Status.OK&&r.v2&&r.v2.addresses&&r.v2.addresses[0];
+      geoCache[addr]=a?{lat:+a.y,lng:+a.x}:null;res(geoCache[addr]);
+    });
+  });
+}
+const mapLink=s=>"https://map.naver.com/p/search/"+encodeURIComponent((s.address||s.name||"").trim()||s.name);
+
+/* ---------- 내보내기 ---------- */
+function infoRows(d){
+  return [["행사명",d.title],["기관",d.orgName],["지역",[d.sido,d.sigungu].filter(Boolean).join(" ")],["행사일",d.eventDate||""],["인원",d.headcount?d.headcount+"명":""],["일정",d.tripType||""],["1인 예상비용",won(costPP(d.stops))],["총 예상비용",d.headcount?won(costPP(d.stops)*d.headcount):""]];
+}
+function fname(d,ext){return (d.title||"행사계획").replace(/[\\/:*?"<>|]/g,"_").slice(0,40)+"."+ext}
+function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+function exportXlsx(d){
+  const rows=[["행사 계획서"],[]];
+  infoRows(d).forEach(r=>rows.push(r));
+  rows.push([]);rows.push(["순번","시간","구분","장소/식당명","주소","1인 비용(원)","비고"]);
+  (d.stops||[]).forEach((s,i)=>rows.push([i+1,s.time||"",s.type||"",s.name||"",s.address||"",Number(s.cost)||0,s.memo||""]));
+  if(d.summary){rows.push([]);rows.push(["개요",d.summary])}
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws["!cols"]=[{wch:10},{wch:12},{wch:10},{wch:26},{wch:36},{wch:14},{wch:30}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"행사계획");
+  XLSX.writeFile(wb,fname(d,"xlsx"));
+}
+const xe=s=>String(s??"").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\s*\n\s*/g," ");
+function wp(text,o={}){
+  const rpr=`<w:rPr><w:rFonts w:ascii="맑은 고딕" w:eastAsia="맑은 고딕" w:hAnsi="맑은 고딕"/>${o.b?"<w:b/>":""}<w:sz w:val="${o.sz||20}"/></w:rPr>`;
+  return `<w:p><w:pPr><w:spacing w:before="0" w:after="${o.after??40}"/>${o.c?'<w:jc w:val="center"/>':""}</w:pPr><w:r>${rpr}<w:t xml:space="preserve">${xe(text)}</w:t></w:r></w:p>`;
+}
+function wtbl(widths,rows,headerRow){
+  const tot=widths.reduce((a,b)=>a+b,0);
+  const bd=["top","left","bottom","right","insideH","insideV"].map(k=>`<w:${k} w:val="single" w:sz="4" w:space="0" w:color="808080"/>`).join("");
+  let x=`<w:tbl><w:tblPr><w:tblW w:w="${tot}" w:type="dxa"/><w:tblBorders>${bd}</w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join("")}</w:tblGrid>`;
+  rows.forEach((r,ri)=>{
+    x+=`<w:tr>${headerRow&&ri===0?"<w:trPr><w:tblHeader/></w:trPr>":""}`;
+    r.forEach((c,ci)=>{
+      const head=(headerRow&&ri===0)||(c&&c.h);const txt=c&&c.h?c.t:c;
+      x+=`<w:tc><w:tcPr><w:tcW w:w="${widths[ci]}" w:type="dxa"/>${head?'<w:shd w:val="clear" w:color="auto" w:fill="EDEFF2"/>':""}</w:tcPr>${wp(txt,{b:head,c:head&&headerRow&&ri===0})}</w:tc>`;
+    });
+    x+="</w:tr>";
+  });
+  return x+"</w:tbl>";
+}
+async function exportDocx(d){
+  const info=infoRows(d);const ir=[];
+  for(let i=0;i<info.length;i+=2){const a=info[i],b=info[i+1]||["",""];ir.push([{h:1,t:a[0]},a[1],{h:1,t:b[0]},b[1]])}
+  const srows=[["순번","시간","구분","장소/식당명","주소","1인 비용","비고"]];
+  (d.stops||[]).forEach((s,i)=>srows.push([String(i+1),s.time||"",s.type||"",s.name||"",s.address||"",s.cost?won(s.cost):"",s.memo||""]));
+  let body=wp("행사 계획서",{b:1,sz:36,c:1,after:200})+wtbl([1500,3319,1500,3319],ir)+wp("",{after:120})+wp("일정",{b:1,sz:24,after:80})+wtbl([600,800,800,1900,2500,1200,1838],srows,true)+wp("",{after:80});
+  if(d.summary)body+=wp("개요",{b:1,sz:24,after:60})+wp(d.summary);
+  const sect='<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>';
+  const z=new JSZip();
+  z.file("[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  z.file("_rels/.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  z.file("word/document.xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+sect+'</w:body></w:document>');
+  dl(await z.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}),fname(d,"docx"));
+}
+
+/* ---------- 인증 ---------- */
+function renderAuth(){
+  const u=S.user;
+  $("#auth").innerHTML=u?`<span class="small muted">${esc(u.email)}</span> <button class="btn sm" data-act="logout">로그아웃</button>`:`<button class="btn pri sm" data-act="login">로그인 / 가입</button>`;
+  const nav=[["find","코스 찾기"],["edit","코스 등록"],["plans","내 계획"]];
+  if(isAdmin())nav.push(["admin","신고관리"]);
+  $("#nav").innerHTML=nav.map(([k,l])=>`<button class="${S.view===k?"on":""}" data-act="nav" data-v="${k}">${l}</button>`).join("");
+}
+function authModal(){
+  openModal(`<div class="sheet narrow"><button class="x" data-act="closeModal">×</button>
+  <h3 style="margin-top:0">로그인 / 가입</h3>
+  <p class="small muted">열람은 누구나 가능합니다. 코스·후기 등록은 공공기관 메일(${ALLOWED_DOMAINS.map(d=>"@"+d).join(", ")})로 인증한 분만 가능합니다.</p>
+  <button class="btn" style="width:100%" data-act="google">Google 계정으로 로그인</button>
+  <div class="muted small" style="text-align:center;margin:10px 0">또는 공공기관 이메일</div>
+  <div class="grid"><div><label>이메일</label><input id="lgEmail" type="email" placeholder="name@example.go.kr"></div>
+  <div><label>비밀번호 (8자 이상)</label><input id="lgPw" type="password"></div>
+  <div class="row"><button class="btn pri sp" data-act="emailLogin">로그인</button><button class="btn sp" data-act="emailSignup">가입</button></div>
+  <button class="btn sm" data-act="resetPw">비밀번호 재설정 메일 보내기</button></div></div>`);
+}
+const authErr=e=>{const c=e.code||"";return({"auth/email-already-in-use":"이미 가입된 이메일입니다.","auth/invalid-credential":"이메일 또는 비밀번호가 올바르지 않습니다.","auth/weak-password":"비밀번호는 6자 이상이어야 합니다.","auth/invalid-email":"이메일 형식이 올바르지 않습니다.","auth/popup-closed-by-user":"로그인 창이 닫혔습니다.","auth/too-many-requests":"요청이 많습니다. 잠시 후 다시 시도하세요."})[c]||("오류: "+(e.message||c))};
+
+/* ---------- 모달 ---------- */
+function openModal(h){$("#modal").innerHTML=`<div class="ov" data-act="ovClick">${h}</div>`}
+function closeModal(){$("#modal").innerHTML="";if(location.hash.startsWith("#c/"))history.replaceState(null,"",location.pathname+location.search)}
+
+/* ---------- 데이터 ---------- */
+async function loadCourses(){
+  const qs=await getDocs(query(collection(db,"courses"),orderBy("createdAt","desc"),limit(500)));
+  S.courses=qs.docs.map(d=>({id:d.id,...d.data()}));
+}
+async function loadPlans(){
+  if(!S.user){S.plans=[];return}
+  const qs=await getDocs(query(collection(db,"plans"),where("ownerUid","==",S.user.uid)));
+  S.plans=qs.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0));
+}
+const avg=c=>c.ratingCount?c.ratingSum/c.ratingCount:0;
+
+/* ---------- 화면: 코스 찾기 ---------- */
+function setupGuide(){
+  $("#view").innerHTML=`<div class="card"><h3 style="margin-top:0">초기 설정이 필요합니다</h3><p>index.html 상단의 <b>FIREBASE_CONFIG</b>, <b>NAVER_MAP_KEY_ID</b> 값을 입력한 뒤 다시 열어주세요. 자세한 순서는 함께 드린 SETUP.md를 참고하세요.</p></div>`;
+}
+function viewFind(){
+  const f=S.f;
+  $("#view").innerHTML=`
+  <div class="card"><div class="row"><b>다른 기관의 행사 코스를 찾아 그대로 가져다 쓰세요</b><span class="sp"></span><span class="muted small" id="stat"></span></div>
+  <div class="grid filters" style="margin-top:10px">
+    <div><label>지역</label><select data-f="sido"><option value="">전체</option>${SIDO.map(s=>`<option ${f.sido===s?"selected":""}>${s}</option>`).join("")}</select></div>
+    <div><label>검색어</label><input data-f="q" value="${esc(f.q)}" placeholder="장소·식당·기관"></div>
+    <div><label>우리 인원(±40%)</label><input data-f="n" type="number" min="1" value="${esc(f.n)}" placeholder="예: 40"></div>
+    <div><label>일정</label><select data-f="trip"><option value="">전체</option>${TRIPS.map(s=>`<option ${f.trip===s?"selected":""}>${s}</option>`).join("")}</select></div>
+    <div><label>1인 비용 상한(원)</label><input data-f="max" type="number" min="0" value="${esc(f.max)}" placeholder="예: 50000"></div>
+    <div><label>정렬</label><select data-f="sort">${[["new","최신순"],["rate","평점순"],["copy","복사 많은순"]].map(([k,l])=>`<option value="${k}" ${f.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
+  </div></div>
+  <div id="list" class="list"></div><div id="more" style="text-align:center;margin:10px"></div>`;
+  renderList();
+}
+function filtered(){
+  const f=S.f,q=f.q.trim().toLowerCase(),n=Number(f.n),mx=Number(f.max);
+  let a=S.courses.filter(c=>{
+    if(f.sido&&c.sido!==f.sido)return false;
+    if(f.trip&&c.tripType!==f.trip)return false;
+    if(n&&(!c.headcount||c.headcount<n*0.6||c.headcount>n*1.4))return false;
+    if(mx&&costPP(c.stops)>mx)return false;
+    if(q){const hay=[c.title,c.orgName,c.sido,c.sigungu,c.summary,...(c.stops||[]).map(s=>s.name+" "+(s.address||""))].join(" ").toLowerCase();if(!hay.includes(q))return false}
+    return true;
+  });
+  if(f.sort==="rate")a.sort((x,y)=>avg(y)-avg(x)||(y.ratingCount||0)-(x.ratingCount||0));
+  else if(f.sort==="copy")a.sort((x,y)=>(y.copyCount||0)-(x.copyCount||0));
+  return a;
+}
+function renderList(){
+  const el=$("#list");if(!el)return;
+  const a=filtered();
+  const rv=S.courses.reduce((s,c)=>s+(c.ratingCount||0),0);
+  $("#stat").textContent=`등록 코스 ${S.courses.length}건 · 후기 ${rv}건 · 검색결과 ${a.length}건`;
+  el.innerHTML=a.slice(0,S.shown).map(c=>{
+    const ph=safeUrl((c.photos||[])[0]);
+    return `<div class="card cc" data-act="open" data-id="${esc(c.id)}">
+      ${ph?`<img class="thumb" src="${esc(ph)}" loading="lazy" alt="">`:`<div class="thumb"></div>`}
+      <div style="min-width:0;flex:1"><b>${esc(c.title)}</b><div class="small muted">${esc([c.sido,c.sigungu].filter(Boolean).join(" "))} · ${esc(c.orgName||"")} · ${c.headcount||"-"}명 · ${esc(c.tripType||"")}</div>
+      <div>${stars(avg(c),c.ratingCount||0)} <span class="small muted">· 1인 ${won(costPP(c.stops))} · 복사 ${c.copyCount||0}회</span></div>
+      <div>${(c.stops||[]).filter(s=>s.type!=="이동").slice(0,5).map(s=>`<span class="chip ${chipCls(s.type)}">${esc(s.name)}</span>`).join("")}</div></div></div>`;
+  }).join("")||`<div class="card muted">조건에 맞는 코스가 없습니다.</div>`;
+  $("#more").innerHTML=a.length>S.shown?`<button class="btn" data-act="more">더 보기</button>`:"";
+}
+
+/* ---------- 상세 ---------- */
+async function showDetail(id){
+  let c=S.courses.find(x=>x.id===id);
+  if(!c){const s=await getDoc(doc(db,"courses",id));if(!s.exists()){toast("삭제되었거나 없는 코스입니다");return}c={id:s.id,...s.data()}}
+  openModal(`<div class="sheet"><button class="x" data-act="closeModal">×</button><div class="muted">불러오는 중…</div></div>`);
+  let rvs=[];
+  try{const qs=await getDocs(query(collection(db,"courses",id,"reviews"),orderBy("createdAt","desc")));rvs=qs.docs.map(d=>({uid:d.id,...d.data()}))}catch(e){console.error(e)}
+  S.detail={c,rvs};
+  const mine=S.user&&c.authorUid===S.user.uid;
+  const myRv=S.user&&rvs.find(r=>r.uid===S.user.uid);
+  const stops=c.stops||[];
+  $("#modal").innerHTML=`<div class="ov" data-act="ovClick"><div class="sheet" id="sheet"><button class="x" data-act="closeModal">×</button>
+  <h2 style="margin:0 28px 4px 0">${esc(c.title)}</h2>
+  <div class="muted small">${esc([c.sido,c.sigungu].filter(Boolean).join(" "))} · ${esc(c.orgName||"")} · ${esc(c.eventDate||"")} · ${c.headcount||"-"}명 · ${esc(c.tripType||"")}</div>
+  <div style="margin:6px 0">${stars(avg(c),c.ratingCount||0)} <span class="small muted">· 1인 ${won(costPP(stops))} (총 ${won(costPP(stops)*(c.headcount||0))}) · 복사 ${c.copyCount||0}회</span></div>
+  ${c.summary?`<p style="white-space:pre-wrap">${esc(c.summary)}</p>`:""}
+  <div class="row noprint" style="margin:8px 0">
+    <button class="btn pri" data-act="copy">내 계획으로 복사</button>
+    <button class="btn" data-act="dlXlsx">엑셀</button><button class="btn" data-act="dlDocx">한글/워드(.docx)</button><button class="btn" data-act="print">인쇄/PDF</button>
+    <span class="sp"></span>
+    ${(mine||isAdmin())?`<button class="btn" data-act="editCourse">수정</button><button class="btn dan" data-act="delCourse">삭제</button>`:""}
+    <button class="btn sm" data-act="report" data-t="course">신고</button>
+  </div>
+  <div class="photos">${(c.photos||[]).map(safeUrl).filter(Boolean).map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt=""></a>`).join("")}</div>
+  <div id="map"></div>
+  <div class="tl">${stops.map((s,i)=>{const n=c.stopCnt&&c.stopCnt[i]||0,sm=c.stopSum&&c.stopSum[i]||0;return `<div class="st"><div><b>${i+1}. ${esc(s.name)}</b> <span class="chip ${chipCls(s.type)}">${esc(s.type)}</span> <span class="muted small">${esc(s.time||"")}</span> ${RATED.includes(s.type)?stars(n?sm/n:0,n):""}</div>
+   <div class="small muted">${esc(s.address||"")} ${s.cost?`· 1인 ${won(s.cost)}`:""} · <a href="${esc(mapLink(s))}" target="_blank" rel="noopener">네이버 지도</a></div>${s.memo?`<div class="small">${esc(s.memo)}</div>`:""}</div>`}).join("")}</div>
+  <h3 class="noprint">후기 (${rvs.length})</h3>
+  <div class="noprint">${rvs.map(r=>`<div class="stopbox"><div class="row"><span class="star">★ ${r.rating}</span><b class="small">${esc(r.orgName||"")}</b><span class="sp"></span>
+    ${(S.user&&r.uid===S.user.uid)||isAdmin()?`<button class="btn sm dan" data-act="delReview" data-u="${esc(r.uid)}">삭제</button>`:""}<button class="btn sm" data-act="report" data-t="review" data-u="${esc(r.uid)}">신고</button></div>
+    <div style="white-space:pre-wrap">${esc(r.comment||"")}</div></div>`).join("")||'<div class="muted small">아직 후기가 없습니다.</div>'}</div>
+  <div class="card noprint" style="margin-top:10px">${reviewForm(c,myRv,mine)}</div></div></div>`;
+  drawMap(stops);
+}
+function reviewForm(c,my,mine){
+  if(!S.user)return `<span class="muted">후기를 남기려면 <a href="#" data-act="login">로그인</a>하세요.</span>`;
+  if(!canWrite())return `<span class="muted">공공기관 이메일 인증을 완료해야 후기를 남길 수 있습니다.</span>`;
+  if(mine)return `<span class="muted">내가 등록한 코스에는 후기를 남길 수 없습니다.</span>`;
+  const opt=(v)=>[1,2,3,4,5].map(i=>`<option value="${i}" ${v===i?"selected":""}>${"★".repeat(i)}</option>`).join("");
+  return `<b>${my?"내 후기 수정":"후기 남기기"}</b><div class="grid g2" style="margin-top:6px">
+   <div><label>전체 만족도</label><select id="rvRating">${opt(my?.rating||5)}</select></div>
+   <div><label>우리 기관명</label><input id="rvOrg" value="${esc(my?.orgName||S.lastOrg)}" placeholder="예: ○○군 ○○과"></div></div>
+   <div class="grid g3" style="margin-top:8px">${(c.stops||[]).map((s,i)=>RATED.includes(s.type)?`<div><label>${esc(s.name)}</label><select class="rvStop" data-i="${i}"><option value="0">평가 안 함</option>${opt(my?.stopRatings?.[i]||0)}</select></div>`:"").join("")}</div>
+   <div style="margin-top:8px"><label>한줄평 (단체 수용, 주차, 가격, 아쉬운 점 등)</label><textarea id="rvText" maxlength="500">${esc(my?.comment||"")}</textarea></div>
+   <button class="btn pri" style="margin-top:8px" data-act="saveReview">${my?"수정 저장":"등록"}</button>`;
+}
+async function drawMap(stops){
+  const el=$("#map");if(!el)return;
+  if(!NAVER_OK||!(window.naver&&naver.maps)){el.style.display="none";return}
+  const pts=[];
+  for(let i=0;i<stops.length;i++){
+    const s=stops[i];let p=(s.lat&&s.lng)?{lat:s.lat,lng:s.lng}:await geocode(s.address);
+    if(p)pts.push({...p,i,name:s.name});
+  }
+  if(!pts.length){el.style.display="none";return}
+  const map=new naver.maps.Map(el,{center:new naver.maps.LatLng(pts[0].lat,pts[0].lng),zoom:11});
+  const b=new naver.maps.LatLngBounds();
+  pts.forEach(p=>{const ll=new naver.maps.LatLng(p.lat,p.lng);b.extend(ll);
+    const m=new naver.maps.Marker({position:ll,map,title:p.name,icon:{content:`<div class="mk">${p.i+1}</div>`,anchor:new naver.maps.Point(13,13)}})});
+  if(pts.length>1){new naver.maps.Polyline({map,path:pts.map(p=>new naver.maps.LatLng(p.lat,p.lng)),strokeColor:"#2563eb",strokeOpacity:.6,strokeWeight:3});map.fitBounds(b,{top:30,right:30,bottom:30,left:30})}
+}
+
+/* ---------- 후기/신고 ---------- */
+async function saveReview(){
+  if(!canWrite())return toast("공공기관 이메일 인증 후 가능합니다");
+  const {c}=S.detail,uid=S.user.uid;
+  const rating=Number($("#rvRating").value),org=$("#rvOrg").value.trim(),comment=$("#rvText").value.trim();
+  if(!org)return toast("기관명을 입력하세요");
+  const sr=(c.stops||[]).map(()=>0);document.querySelectorAll(".rvStop").forEach(s=>sr[+s.dataset.i]=Number(s.value));
+  S.lastOrg=org;localStorage.setItem("lastOrg",org);
+  try{
+    await applyReview(c.id,uid,{rating,stopRatings:sr,comment,orgName:org,uid,createdAt:serverTimestamp()});
+    toast("후기가 등록되었습니다");await loadCourses();showDetail(c.id);
+  }catch(e){console.error(e);toast("저장 실패: "+(e.code||e.message))}
+}
+async function applyReview(cid,uid,data){ // data=null이면 삭제
+  const cref=doc(db,"courses",cid),rref=doc(db,"courses",cid,"reviews",uid);
+  await runTransaction(db,async tx=>{
+    const [cs,rs]=await Promise.all([tx.get(cref),tx.get(rref)]);
+    if(!cs.exists())throw new Error("코스가 없습니다");
+    const c=cs.data(),n=(c.stops||[]).length;
+    let sum=c.ratingSum||0,cnt=c.ratingCount||0;
+    const ss=Array.from({length:n},(_,i)=>(c.stopSum||[])[i]||0),sc=Array.from({length:n},(_,i)=>(c.stopCnt||[])[i]||0);
+    if(rs.exists()){const o=rs.data();sum-=o.rating;cnt--;(o.stopRatings||[]).forEach((v,i)=>{if(v>0&&i<n){ss[i]-=v;sc[i]--}})}
+    if(data){sum+=data.rating;cnt++;data.stopRatings.forEach((v,i)=>{if(v>0&&i<n){ss[i]+=v;sc[i]++}});tx.set(rref,data)}else tx.delete(rref);
+    tx.update(cref,{ratingSum:sum,ratingCount:cnt,avgRating:cnt?sum/cnt:0,stopSum:ss,stopCnt:sc});
+  });
+}
+function reportModal(t,u){
+  if(!canWrite())return toast("공공기관 이메일 인증 후 신고할 수 있습니다");
+  openModal(`<div class="sheet narrow"><button class="x" data-act="closeModal">×</button><h3 style="margin-top:0">신고하기</h3>
+  <div class="grid"><div><label>사유</label><select id="rpReason"><option>잘못된 정보(주소·가격 등)</option><option>광고·홍보성 내용</option><option>부적절한 표현</option><option>개인정보 포함</option><option>기타</option></select></div>
+  <div><label>상세 내용</label><textarea id="rpText" maxlength="500"></textarea></div>
+  <button class="btn pri" data-act="sendReport" data-t="${esc(t)}" data-u="${esc(u||"")}">신고 접수</button></div></div>`);
+}
+async function sendReport(t,u){
+  const {c}=S.detail;
+  try{
+    await addDoc(collection(db,"reports"),{type:t,courseId:c.id,courseTitle:c.title,reviewUid:u||"",reason:$("#rpReason").value,detail:$("#rpText").value.trim(),reporterUid:S.user.uid,createdAt:serverTimestamp()});
+    toast("신고가 접수되었습니다");showDetail(c.id);
+  }catch(e){console.error(e);toast("신고 실패: "+(e.code||e.message))}
+}
+
+/* ---------- 에디터 (코스/계획 공용) ---------- */
+const blankStop=()=>({time:"",type:"방문지",name:"",address:"",cost:"",memo:"",lat:null,lng:null});
+function startEdit(mode,data,id){
+  S.ed={mode,id:id||null,d:data?JSON.parse(JSON.stringify(data)):{title:"",orgName:S.lastOrg,sido:"",sigungu:"",eventDate:"",headcount:"",tripType:"당일",summary:"",stops:[blankStop()],photos:[]},files:[],lock:!!(data&&mode==="course"&&data.ratingCount>0)};
+  if(!S.ed.d.stops||!S.ed.d.stops.length)S.ed.d.stops=[blankStop()];
+  S.ed.d.photos=S.ed.d.photos||[];
+  S.view=mode==="course"?"edit":"planedit";closeModal();render();
+}
+function syncEd(){
+  const E=S.ed;if(!E||!$("#edTitle"))return;const d=E.d;
+  d.title=$("#edTitle").value;d.orgName=$("#edOrg").value;d.sido=$("#edSido").value;d.sigungu=$("#edSigungu").value;d.eventDate=$("#edDate").value;d.headcount=$("#edN").value;d.tripType=$("#edTrip").value;d.summary=$("#edSum").value;
+  document.querySelectorAll(".stopbox[data-i]").forEach(b=>{
+    const s=d.stops[+b.dataset.i];if(!s)return;
+    const g=k=>b.querySelector(`[data-k="${k}"]`).value;
+    const na=g("address").trim();if(na!==(s.address||"")){s.lat=null;s.lng=null}
+    s.time=g("time");s.type=g("type");s.name=g("name");s.address=na;s.cost=g("cost");s.memo=g("memo");
+  });
+}
+function viewEdit(){
+  const E=S.ed||(startEdit("course"),S.ed);if(!E)return;const d=E.d;
+  const isC=E.mode==="course";
+  if(isC&&!canWrite()){
+    $("#view").innerHTML=`<div class="card"><b>코스 등록은 공공기관 이메일(${ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")}) 인증 후 가능합니다.</b><p class="muted">우측 상단에서 로그인하고, 가입 시 받은 인증 메일의 링크를 눌러주세요.</p><button class="btn pri" data-act="login">로그인 / 가입</button></div>`;return;
+  }
+  $("#view").innerHTML=`<div class="card"><h3 style="margin-top:0">${isC?(E.id?"코스 수정":"다녀온 행사 코스 등록"):(E.id?"내 계획 편집":"새 계획 만들기")}</h3>
+  ${isC?`<p class="small muted">실제로 진행했던 일정을 그대로 적어주세요. 다른 기관이 후기와 함께 보고 복사해 갈 수 있습니다. 개인정보(담당자 이름·연락처)는 적지 마세요.</p>`:""}
+  <div class="grid g3">
+   <div style="grid-column:1/-1"><label>행사명 *</label><input id="edTitle" maxlength="60" value="${esc(d.title)}" placeholder="예: 2026 하반기 직원 단합대회(부여·공주 역사탐방)"></div>
+   <div><label>기관명 *</label><input id="edOrg" value="${esc(d.orgName)}" placeholder="○○군 ○○과"></div>
+   <div><label>시·도 *</label><select id="edSido"><option value="">선택</option>${SIDO.map(s=>`<option ${d.sido===s?"selected":""}>${s}</option>`).join("")}</select></div>
+   <div><label>시·군·구</label><input id="edSigungu" value="${esc(d.sigungu)}" placeholder="부여군"></div>
+   <div><label>행사일</label><input id="edDate" type="date" value="${esc(d.eventDate)}"></div>
+   <div><label>인원 *</label><input id="edN" type="number" min="1" value="${esc(d.headcount)}"></div>
+   <div><label>일정</label><select id="edTrip">${TRIPS.map(s=>`<option ${d.tripType===s?"selected":""}>${s}</option>`).join("")}</select></div>
+   <div style="grid-column:1/-1"><label>개요 / 팁 (이동수단, 예약 요령, 날씨 대안 등)</label><textarea id="edSum" maxlength="1000">${esc(d.summary)}</textarea></div>
+  </div></div>
+  <div class="card"><div class="row"><b>일정</b><span class="muted small">식당·방문지·숙소는 후기 평가 대상이 됩니다 · 1인 비용 합계 ${won(costPP(d.stops))}</span></div>
+  ${E.lock?`<div class="banner small">이미 후기가 있어 일정 항목의 추가·삭제·순서변경은 할 수 없습니다. (내용 수정만 가능)</div>`:""}
+  ${d.stops.map((s,i)=>`<div class="stopbox" data-i="${i}"><div class="grid g4">
+    <div><label>시간</label><input data-k="time" type="time" value="${esc(s.time)}"></div>
+    <div><label>구분</label><select data-k="type">${TYPES.map(t=>`<option ${s.type===t?"selected":""}>${t}</option>`).join("")}</select></div>
+    <div style="grid-column:span 2"><label>장소/식당명 *</label><input data-k="name" maxlength="50" value="${esc(s.name)}"></div>
+    <div style="grid-column:span 2"><label>주소 (지도 표시용)</label><input data-k="address" value="${esc(s.address)}" placeholder="도로명주소"></div>
+    <div><label>1인 비용(원)</label><input data-k="cost" type="number" min="0" value="${esc(s.cost)}"></div>
+    <div><label>&nbsp;</label><a class="btn sm" style="display:inline-block" target="_blank" rel="noopener" href="${esc(mapLink({name:s.name||"",address:""}))}">네이버 지도에서 검색</a></div>
+    <div style="grid-column:1/-1"><label>메모 (단체석, 주차, 예약 필요 등)</label><input data-k="memo" maxlength="120" value="${esc(s.memo)}"></div></div>
+    ${E.lock?"":`<div class="row" style="margin-top:6px"><button class="btn sm" data-act="stMove" data-i="${i}" data-d="-1">↑</button><button class="btn sm" data-act="stMove" data-i="${i}" data-d="1">↓</button><button class="btn sm dan" data-act="stDel" data-i="${i}">삭제</button></div>`}</div>`).join("")}
+  ${E.lock?"":`<button class="btn" data-act="stAdd">+ 일정 항목 추가</button>`}</div>
+  <div class="card"><b>사진</b> <span class="muted small">(최대 6장, 자동 압축)</span>
+   <div class="photos">${d.photos.map((u,i)=>`<div class="pv"><img src="${esc(safeUrl(u))}" alt=""><button data-act="phDelOld" data-i="${i}">×</button></div>`).join("")}${E.files.map((f,i)=>`<div class="pv"><img src="${esc(f.url)}" alt=""><button data-act="phDelNew" data-i="${i}">×</button></div>`).join("")}</div>
+   <input id="edFiles" type="file" accept="image/*" multiple></div>
+  <div class="row"><button class="btn pri" id="btnSave" data-act="saveEd">${isC?(E.id?"수정 저장":"코스 공유 등록"):"계획 저장"}</button>
+   <button class="btn" data-act="cancelEd">취소</button>
+   <span class="sp"></span><button class="btn" data-act="edXlsx">엑셀</button><button class="btn" data-act="edDocx">한글/워드(.docx)</button></div>`;
+  $("#edFiles").onchange=e=>{
+    syncEd();
+    for(const f of e.target.files){if(d.photos.length+E.files.length>=6){toast("사진은 최대 6장입니다");break}E.files.push({file:f,url:URL.createObjectURL(f)})}
+    viewEdit();
+  };
+}
+async function compress(file){
+  const bmp=await createImageBitmap(file,{imageOrientation:"from-image"});
+  const sc=Math.min(1,1280/Math.max(bmp.width,bmp.height)),w=Math.round(bmp.width*sc),h=Math.round(bmp.height*sc);
+  const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(bmp,0,0,w,h);
+  let blob;for(let q=.85;q>=.4;q-=.1){blob=await new Promise(r=>c.toBlob(r,"image/jpeg",q));if(blob.size<=500*1024)break}
+  return blob;
+}
+async function saveEd(){
+  syncEd();const E=S.ed,d=E.d,isC=E.mode==="course";
+  const num=v=>v===""||v==null?0:Number(v);
+  if(!d.title.trim())return toast("행사명을 입력하세요");
+  if(!d.orgName.trim())return toast("기관명을 입력하세요");
+  if(!d.sido)return toast("시·도를 선택하세요");
+  if(!(num(d.headcount)>0))return toast("인원을 입력하세요");
+  if(d.stops.some(s=>!s.name.trim()))return toast("장소/식당명이 비어 있는 항목이 있습니다");
+  if(isC&&!canWrite())return toast("공공기관 이메일 인증 후 가능합니다");
+  const btn=$("#btnSave");btn.disabled=true;btn.textContent="저장 중…";
+  S.lastOrg=d.orgName.trim();localStorage.setItem("lastOrg",S.lastOrg);
+  try{
+    const stops=[];
+    for(const s of d.stops){
+      const o={time:s.time||"",type:s.type,name:s.name.trim(),address:(s.address||"").trim(),cost:num(s.cost),memo:(s.memo||"").trim(),lat:s.lat||null,lng:s.lng||null};
+      if(o.address&&!o.lat){const p=await geocode(o.address);if(p){o.lat=p.lat;o.lng=p.lng}}
+      stops.push(o);
+    }
+    const base={title:d.title.trim(),orgName:d.orgName.trim(),sido:d.sido,sigungu:(d.sigungu||"").trim(),eventDate:d.eventDate||"",headcount:num(d.headcount),tripType:d.tripType,summary:(d.summary||"").trim(),stops,costPerPerson:costPP(stops)};
+    if(isC){
+      const cref=E.id?doc(db,"courses",E.id):doc(collection(db,"courses"));
+      const urls=[...d.photos];
+      for(let i=0;i<E.files.length;i++){
+        const blob=await compress(E.files[i].file);
+        const r=ref(st,`courses/${cref.id}/${Date.now()}_${i}.jpg`);
+        await uploadBytes(r,blob,{contentType:"image/jpeg"});urls.push(await getDownloadURL(r));
+      }
+      if(E.id){
+        const old=S.courses.find(c=>c.id===E.id);
+        for(const u of (old?.photos||[]))if(!urls.includes(u))deleteObject(ref(st,u)).catch(()=>{});
+        await updateDoc(cref,{...base,photos:urls,updatedAt:serverTimestamp()});
+      }else{
+        await setDoc(cref,{...base,photos:urls,authorUid:S.user.uid,ratingSum:0,ratingCount:0,avgRating:0,stopSum:stops.map(()=>0),stopCnt:stops.map(()=>0),copyCount:0,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+      }
+      await loadCourses();S.ed=null;S.view="find";toast("코스가 저장되었습니다");render();
+    }else{
+      if(!S.user){btn.disabled=false;btn.textContent="계획 저장";return authModal()}
+      const payload={...base,photos:[],ownerUid:S.user.uid,sourceCourseId:d.sourceCourseId||"",sourceTitle:d.sourceTitle||"",updatedAt:serverTimestamp()};
+      if(E.id)await setDoc(doc(db,"plans",E.id),payload);else await addDoc(collection(db,"plans"),payload);
+      await loadPlans();S.ed=null;S.view="plans";toast("계획이 저장되었습니다");render();
+    }
+  }catch(e){console.error(e);toast("저장 실패: "+(e.code||e.message),4000);const b=$("#btnSave");if(b){b.disabled=false;b.textContent="다시 저장"}}
+}
+
+/* ---------- 내 계획 ---------- */
+function viewPlans(){
+  if(!S.user){$("#view").innerHTML=`<div class="card">로그인하면 복사한 계획을 저장하고 이어서 편집할 수 있습니다.<br><button class="btn pri" style="margin-top:8px" data-act="login">로그인 / 가입</button></div>`;return}
+  $("#view").innerHTML=`<div class="row" style="margin-bottom:10px"><b>내 계획 (나만 볼 수 있습니다)</b><span class="sp"></span><button class="btn pri" data-act="newPlan">+ 새 계획</button></div>
+  ${S.plans.map(p=>`<div class="card"><div class="row"><b>${esc(p.title)}</b><span class="muted small">${esc([p.sido,p.sigungu].filter(Boolean).join(" "))} · ${p.headcount||"-"}명 · 1인 ${won(costPP(p.stops))}</span><span class="sp"></span>
+   <button class="btn sm" data-act="planEdit" data-id="${esc(p.id)}">편집</button><button class="btn sm" data-act="planXlsx" data-id="${esc(p.id)}">엑셀</button><button class="btn sm" data-act="planDocx" data-id="${esc(p.id)}">문서</button>
+   <button class="btn sm" data-act="planShare" data-id="${esc(p.id)}">코스로 공유</button><button class="btn sm dan" data-act="planDel" data-id="${esc(p.id)}">삭제</button></div>
+   <div>${(p.stops||[]).map(s=>`<span class="chip ${chipCls(s.type)}">${esc(s.name)}</span>`).join("")}</div>
+   ${p.sourceTitle?`<div class="small muted">원본 코스: ${esc(p.sourceTitle)}</div>`:""}</div>`).join("")||'<div class="card muted">저장된 계획이 없습니다. 코스 상세에서 “내 계획으로 복사”를 눌러보세요.</div>'}`;
+}
+
+/* ---------- 관리자 ---------- */
+async function viewAdmin(){
+  $("#view").innerHTML=`<div class="card muted">불러오는 중…</div>`;
+  try{
+    const qs=await getDocs(query(collection(db,"reports"),orderBy("createdAt","desc"),limit(200)));
+    S.reports=qs.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){$("#view").innerHTML=`<div class="card">불러오기 실패: ${esc(e.code||e.message)}</div>`;return}
+  $("#view").innerHTML=`<b>신고 목록 (${S.reports.length})</b>`+(S.reports.map(r=>`<div class="card"><div class="row"><b>${r.type==="course"?"코스":"후기"}</b> <span>${esc(r.courseTitle||"")}</span><span class="sp"></span><span class="small muted">${esc(r.reason)}</span></div>
+   <div class="small">${esc(r.detail||"")}</div><div class="row" style="margin-top:6px"><button class="btn sm" data-act="rpOpen" data-c="${esc(r.courseId)}">대상 보기</button>
+   <button class="btn sm dan" data-act="rpDelTarget" data-id="${esc(r.id)}">대상 삭제</button><button class="btn sm" data-act="rpClose" data-id="${esc(r.id)}">신고 종결</button></div></div>`).join("")||'<div class="card muted">접수된 신고가 없습니다.</div>');
+}
+
+/* ---------- 렌더 ---------- */
+function render(){
+  renderAuth();
+  if(!CONFIGURED)return setupGuide();
+  const banner=S.user&&!S.user.emailVerified?`<div class="banner">이메일 인증이 아직 완료되지 않았습니다. 받은 메일의 링크를 누른 뒤 <button class="btn sm" data-act="reloadUser">인증 확인</button> <button class="btn sm" data-act="resend">메일 다시 받기</button></div>`:(S.user&&S.user.emailVerified&&!domainOk(S.user.email)?`<div class="banner">공공기관 이메일(${ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")})이 아니어서 열람만 가능합니다.</div>`:"");
+  const v=S.view;
+  if(v==="find"){viewFind()}else if(v==="edit"||v==="planedit"){viewEdit()}else if(v==="plans"){viewPlans()}else if(v==="admin"){viewAdmin()}
+  if(banner)$("#view").insertAdjacentHTML("afterbegin",banner);
+}
+
+/* ---------- 이벤트 ---------- */
+const H={
+  nav:t=>{if(t.dataset.v==="edit"){if(!S.ed||S.ed.mode!=="course")S.ed=null;startEdit("course");return}S.view=t.dataset.v;S.ed=null;render();if(S.view==="plans")loadPlans().then(()=>S.view==="plans"&&viewPlans())},
+  login:(t,e)=>{e.preventDefault();authModal()},
+  closeModal:()=>closeModal(),
+  ovClick:(t,e)=>{if(e.target===t)closeModal()},
+  logout:async()=>{await signOut(auth);toast("로그아웃되었습니다")},
+  google:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());closeModal()}catch(e){toast(authErr(e))}},
+  emailLogin:async()=>{try{await signInWithEmailAndPassword(auth,$("#lgEmail").value.trim(),$("#lgPw").value);closeModal()}catch(e){toast(authErr(e))}},
+  emailSignup:async()=>{
+    const em=$("#lgEmail").value.trim(),pw=$("#lgPw").value;
+    if(!domainOk(em))return toast("공공기관 이메일("+ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")+")만 가입할 수 있습니다",4000);
+    if(pw.length<8)return toast("비밀번호는 8자 이상으로 입력하세요");
+    try{const c=await createUserWithEmailAndPassword(auth,em,pw);await sendEmailVerification(c.user);closeModal();toast("인증 메일을 보냈습니다. 메일함(스팸함 포함)을 확인하세요",5000)}catch(e){toast(authErr(e))}
+  },
+  resetPw:async()=>{const em=$("#lgEmail").value.trim();if(!em)return toast("이메일을 입력하세요");try{await sendPasswordResetEmail(auth,em);toast("재설정 메일을 보냈습니다")}catch(e){toast(authErr(e))}},
+  resend:async()=>{try{await sendEmailVerification(S.user);toast("인증 메일을 다시 보냈습니다")}catch(e){toast(authErr(e))}},
+  reloadUser:async()=>{await S.user.reload();S.user=auth.currentUser;await auth.currentUser.getIdToken(true);render();toast(S.user.emailVerified?"인증이 확인되었습니다":"아직 인증되지 않았습니다")},
+  more:()=>{S.shown+=30;renderList()},
+  open:t=>{location.hash="c/"+t.dataset.id},
+  print:()=>window.print(),
+  dlXlsx:()=>exportXlsx(S.detail.c),
+  dlDocx:()=>exportDocx(S.detail.c),
+  copy:async()=>{
+    if(!S.user)return authModal();
+    const c=S.detail.c;
+    const data={...c,title:"[복사] "+c.title,eventDate:"",orgName:S.lastOrg,sourceCourseId:c.id,sourceTitle:c.title,photos:[]};
+    try{await updateDoc(doc(db,"courses",c.id),{copyCount:increment(1)}).catch(()=>{})}catch(_){}
+    startEdit("plan",data);toast("복사했습니다. 우리 기관에 맞게 수정하세요");
+  },
+  editCourse:()=>{startEdit("course",S.detail.c,S.detail.c.id)},
+  delCourse:async()=>{
+    if(!confirm("이 코스를 삭제할까요? 후기도 함께 보이지 않게 됩니다."))return;
+    const c=S.detail.c;
+    try{
+      const rs=await getDocs(collection(db,"courses",c.id,"reviews"));
+      for(const r of rs.docs)await deleteDoc(r.ref).catch(()=>{});
+      for(const u of (c.photos||[]))deleteObject(ref(st,u)).catch(()=>{});
+      await deleteDoc(doc(db,"courses",c.id));
+      await loadCourses();closeModal();render();toast("삭제되었습니다");
+    }catch(e){toast("삭제 실패: "+(e.code||e.message))}
+  },
+  saveReview:()=>saveReview(),
+  delReview:async t=>{
+    if(!confirm("후기를 삭제할까요?"))return;
+    try{await applyReview(S.detail.c.id,t.dataset.u,null);await loadCourses();showDetail(S.detail.c.id)}catch(e){toast("삭제 실패: "+(e.code||e.message))}
+  },
+  report:t=>reportModal(t.dataset.t,t.dataset.u),
+  sendReport:t=>sendReport(t.dataset.t,t.dataset.u),
+  stAdd:()=>{syncEd();S.ed.d.stops.push(blankStop());viewEdit()},
+  stDel:t=>{syncEd();const s=S.ed.d.stops;if(s.length<=1)return toast("최소 1개 항목이 필요합니다");s.splice(+t.dataset.i,1);viewEdit()},
+  stMove:t=>{syncEd();const s=S.ed.d.stops,i=+t.dataset.i,j=i+ +t.dataset.d;if(j<0||j>=s.length)return;[s[i],s[j]]=[s[j],s[i]];viewEdit()},
+  phDelOld:t=>{syncEd();S.ed.d.photos.splice(+t.dataset.i,1);viewEdit()},
+  phDelNew:t=>{syncEd();S.ed.files.splice(+t.dataset.i,1);viewEdit()},
+  saveEd:()=>saveEd(),
+  cancelEd:()=>{S.ed=null;S.view=S.view==="planedit"?"plans":"find";render()},
+  edXlsx:()=>{syncEd();exportXlsx(S.ed.d)},
+  edDocx:()=>{syncEd();exportDocx(S.ed.d)},
+  newPlan:()=>startEdit("plan"),
+  planEdit:t=>{const p=S.plans.find(x=>x.id===t.dataset.id);startEdit("plan",p,p.id)},
+  planXlsx:t=>exportXlsx(S.plans.find(x=>x.id===t.dataset.id)),
+  planDocx:t=>exportDocx(S.plans.find(x=>x.id===t.dataset.id)),
+  planDel:async t=>{if(!confirm("계획을 삭제할까요?"))return;await deleteDoc(doc(db,"plans",t.dataset.id));await loadPlans();viewPlans()},
+  planShare:t=>{const p=S.plans.find(x=>x.id===t.dataset.id);if(!canWrite())return toast("공공기관 이메일 인증 후 공유할 수 있습니다");const d={...p,title:p.title.replace(/^\[복사\]\s*/,"")};delete d.id;startEdit("course",d)},
+  rpOpen:t=>{location.hash="c/"+t.dataset.c},
+  rpDelTarget:async t=>{
+    const r=S.reports.find(x=>x.id===t.dataset.id);if(!confirm("신고 대상을 삭제할까요?"))return;
+    try{
+      if(r.type==="review")await applyReview(r.courseId,r.reviewUid,null);
+      else{const rs=await getDocs(collection(db,"courses",r.courseId,"reviews"));for(const x of rs.docs)await deleteDoc(x.ref).catch(()=>{});await deleteDoc(doc(db,"courses",r.courseId))}
+      await deleteDoc(doc(db,"reports",r.id));await loadCourses();viewAdmin();toast("삭제했습니다")
+    }catch(e){toast("실패: "+(e.code||e.message))}
+  },
+  rpClose:async t=>{await deleteDoc(doc(db,"reports",t.dataset.id));viewAdmin()}
+};
+document.addEventListener("click",e=>{const t=e.target.closest("[data-act]");if(!t)return;const f=H[t.dataset.act];if(f){if(t.tagName==="A")e.preventDefault();f(t,e)}});
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.f;if(!k)return;S.f[k]=e.target.value;S.shown=30;renderList()});
+window.addEventListener("hashchange",()=>{const m=location.hash.match(/^#c\/(.+)$/);if(m)showDetail(decodeURIComponent(m[1]));else if($("#modal").firstChild&&S.detail)$("#modal").innerHTML=""});
+
+/* ---------- 시작 ---------- */
+(async function init(){
+  renderAuth();
+  if(!CONFIGURED)return setupGuide();
+  app=initializeApp(FIREBASE_CONFIG);auth=getAuth(app);db=getFirestore(app);st=getStorage(app);
+  loadNaver();
+  try{await loadCourses()}catch(e){console.error(e);toast("목록을 불러오지 못했습니다: "+(e.code||e.message),5000)}
+  onAuthStateChanged(auth,async u=>{
+    S.user=u;if(u)await loadPlans();else S.plans=[];
+    if(S.view!=="edit"&&S.view!=="planedit")render();else renderAuth();
+  });
+  render();
+  const m=location.hash.match(/^#c\/(.+)$/);if(m)showDetail(decodeURIComponent(m[1]));
+})();
+</script>
+</body>
+</html>
