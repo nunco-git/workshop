@@ -85,7 +85,7 @@ pre{background:#f5f6f8;padding:10px;border-radius:8px;overflow:auto;font-size:12
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,collection,doc,getDoc,getDocs,setDoc,updateDoc,deleteDoc,addDoc,query,orderBy,limit,where,serverTimestamp,runTransaction,increment} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
@@ -100,7 +100,6 @@ const FIREBASE_CONFIG = {
   measurementId: "G-8V2HEH8K0X"
 };
 const NAVER_MAP_KEY_ID = "bgg27fnbf8";                // 맵마커 앱과 동일한 NCP Maps Client ID
-const ALLOWED_DOMAINS  = ["go.kr","korea.kr","ac.kr","or.kr","sc.kr","es.kr","ms.kr","hs.kr","re.kr"]; // 쓰기 허용 이메일 도메인 (규칙 파일과 동일하게)
 const ADMIN_EMAILS     = ["smartgongmaster@gmail.com"];                          // 관리자 이메일 (규칙 파일과 동일하게)
 /* ========================================================== */
 
@@ -117,14 +116,14 @@ const won=n=>(Number(n)||0).toLocaleString("ko-KR")+"원";
 const toast=(m,ms=2600)=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",ms)};
 const chipCls=t=>t==="식당"?"meal":t==="방문지"?"place":t==="숙소"?"stay":"";
 const safeUrl=u=>/^https:\/\//.test(u||"")?u:"";
-const domainOk=e=>{e=(e||"").toLowerCase();const at=e.lastIndexOf("@");if(at<0)return false;const d=e.slice(at+1);return ALLOWED_DOMAINS.some(a=>d===a||d.endsWith("."+a))};
 const stars=(a,n)=>n?`<span class="star">★ ${a.toFixed(1)}</span> <span class="muted small">(${n})</span>`:`<span class="muted small">평가 없음</span>`;
 const costPP=stops=>(stops||[]).reduce((s,x)=>s+(Number(x.cost)||0),0);
 
 const S={user:null,view:"find",courses:[],plans:[],reports:[],f:{sido:"",q:"",n:"",trip:"",max:"",minr:"",sort:"new"},shown:30,ed:null,lastOrg:localStorage.getItem("lastOrg")||""};
 let app,auth,db,st;
 const isAdmin=()=>S.user&&S.user.emailVerified&&ADMIN_EMAILS.includes((S.user.email||"").toLowerCase());
-const canWrite=()=>S.user&&S.user.emailVerified&&domainOk(S.user.email);
+const canWrite=()=>!!S.user;
+const needAff=msg=>{if(canWrite())return false;toast(msg||"Google 로그인 후 이용할 수 있습니다");authModal();return true};
 
 /* ---------- 네이버 지도 ---------- */
 let NAVER_OK=false;
@@ -209,23 +208,18 @@ async function exportDocx(d){
 /* ---------- 인증 ---------- */
 function renderAuth(){
   const u=S.user;
-  $("#auth").innerHTML=u?`<span class="small muted">${esc(u.email)}</span> <button class="btn sm" data-act="logout">로그아웃</button>`:`<button class="btn pri sm" data-act="login">로그인 / 가입</button>`;
+  $("#auth").innerHTML=u?`<span class="small muted">${esc(u.email)}</span>${isAdmin()?' <span class="chip">관리자</span>':""} <button class="btn sm" data-act="logout">로그아웃</button>`:`<button class="btn pri sm" data-act="login">Google 로그인</button>`;
   const nav=[["find","코스 찾기"],["edit","코스 등록"],["plans","내 계획"]];
   if(isAdmin())nav.push(["admin","신고관리"]);
   $("#nav").innerHTML=nav.map(([k,l])=>`<button class="${S.view===k?"on":""}" data-act="nav" data-v="${k}">${l}</button>`).join("");
 }
 function authModal(){
   openModal(`<div class="sheet narrow"><button class="x" data-act="closeModal">×</button>
-  <h3 style="margin-top:0">로그인 / 가입</h3>
-  <p class="small muted">열람은 누구나 가능합니다. 코스·후기 등록은 공공기관 메일(${ALLOWED_DOMAINS.map(d=>"@"+d).join(", ")})로 인증한 분만 가능합니다.</p>
-  <button class="btn" style="width:100%" data-act="google">Google 계정으로 로그인</button>
-  <div class="muted small" style="text-align:center;margin:10px 0">또는 공공기관 이메일</div>
-  <div class="grid"><div><label>이메일</label><input id="lgEmail" type="email" placeholder="name@example.go.kr"></div>
-  <div><label>비밀번호 (8자 이상)</label><input id="lgPw" type="password"></div>
-  <div class="row"><button class="btn pri sp" data-act="emailLogin">로그인</button><button class="btn sp" data-act="emailSignup">가입</button></div>
-  <button class="btn sm" data-act="resetPw">비밀번호 재설정 메일 보내기</button></div></div>`);
+  <h3 style="margin-top:0">로그인</h3>
+  <p class="small muted">열람은 로그인 없이 누구나 가능합니다. 코스·후기 작성과 내 계획 저장은 Google 계정으로 로그인하면 됩니다.</p>
+  <button class="btn pri" style="width:100%" data-act="google">Google 계정으로 로그인</button></div></div>`);
 }
-const authErr=e=>{const c=e.code||"";return({"auth/email-already-in-use":"이미 가입된 이메일입니다.","auth/invalid-credential":"이메일 또는 비밀번호가 올바르지 않습니다.","auth/weak-password":"비밀번호는 6자 이상이어야 합니다.","auth/invalid-email":"이메일 형식이 올바르지 않습니다.","auth/popup-closed-by-user":"로그인 창이 닫혔습니다.","auth/too-many-requests":"요청이 많습니다. 잠시 후 다시 시도하세요."})[c]||("오류: "+(e.message||c))};
+const authErr=e=>{const c=e.code||"";return({"auth/email-already-in-use":"이미 다른 계정에 연결된 이메일입니다. 해당 이메일로 이전에 가입/인증한 계정이 있는지 확인하세요.","auth/credential-already-in-use":"이미 다른 계정에 연결된 이메일입니다. 해당 이메일로 이전에 가입/인증한 계정이 있는지 확인하세요.","auth/invalid-action-code":"인증 링크가 만료되었거나 이미 사용되었습니다. 인증 메일을 다시 받으세요.","auth/invalid-email":"이메일 형식이 올바르지 않습니다.","auth/popup-closed-by-user":"로그인 창이 닫혔습니다.","auth/operation-not-allowed":"Firebase에서 '이메일 링크 로그인'이 아직 켜져 있지 않습니다.","auth/unauthorized-continue-uri":"Firebase 승인된 도메인에 이 사이트 주소가 등록되어 있지 않습니다.","auth/too-many-requests":"요청이 많습니다. 잠시 후 다시 시도하세요."})[c]||("오류: "+(e.message||c))};
 
 /* ---------- 모달 ---------- */
 function openModal(h){$("#modal").innerHTML=`<div class="ov" data-act="ovClick">${h}</div>`}
@@ -328,7 +322,7 @@ async function showDetail(id){
 }
 function reviewForm(c,my,mine){
   if(!S.user)return `<span class="muted">후기를 남기려면 <a href="#" data-act="login">로그인</a>하세요.</span>`;
-  if(!canWrite())return `<span class="muted">공공기관 이메일 인증을 완료해야 후기를 남길 수 있습니다.</span>`;
+  
   if(mine)return `<span class="muted">내가 등록한 코스에는 후기를 남길 수 없습니다.</span>`;
   const opt=(v)=>[1,2,3,4,5].map(i=>`<option value="${i}" ${v===i?"selected":""}>${"★".repeat(i)}</option>`).join("");
   return `<b>${my?"내 후기 수정":"후기 남기기"}</b><div class="grid g2" style="margin-top:6px">
@@ -356,7 +350,7 @@ async function drawMap(stops){
 
 /* ---------- 후기/신고 ---------- */
 async function saveReview(){
-  if(!canWrite())return toast("공공기관 이메일 인증 후 가능합니다");
+  if(needAff())return;
   const {c}=S.detail,uid=S.user.uid;
   const rating=Number($("#rvRating").value),org=$("#rvOrg").value.trim(),comment=$("#rvText").value.trim();
   if(!org)return toast("기관명을 입력하세요");
@@ -381,7 +375,7 @@ async function applyReview(cid,uid,data){ // data=null이면 삭제
   });
 }
 function reportModal(t,u){
-  if(!canWrite())return toast("공공기관 이메일 인증 후 신고할 수 있습니다");
+  if(needAff())return;
   openModal(`<div class="sheet narrow"><button class="x" data-act="closeModal">×</button><h3 style="margin-top:0">신고하기</h3>
   <div class="grid"><div><label>사유</label><select id="rpReason"><option>잘못된 정보(주소·가격 등)</option><option>광고·홍보성 내용</option><option>부적절한 표현</option><option>개인정보 포함</option><option>기타</option></select></div>
   <div><label>상세 내용</label><textarea id="rpText" maxlength="500"></textarea></div>
@@ -417,7 +411,7 @@ function viewEdit(){
   const E=S.ed||(startEdit("course"),S.ed);if(!E)return;const d=E.d;
   const isC=E.mode==="course";
   if(isC&&!canWrite()){
-    $("#view").innerHTML=`<div class="card"><b>코스 등록은 공공기관 이메일(${ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")}) 인증 후 가능합니다.</b><p class="muted">우측 상단에서 로그인하고, 가입 시 받은 인증 메일의 링크를 눌러주세요.</p><button class="btn pri" data-act="login">로그인 / 가입</button></div>`;return;
+    $("#view").innerHTML=`<div class="card"><b>코스 등록은 Google 로그인 후 가능합니다.</b><p class="muted">로그인하면 다른 기관이 볼 수 있는 코스를 등록할 수 있습니다.</p><button class="btn pri" data-act="login">Google 로그인</button></div>`;return;
   }
   $("#view").innerHTML=`<div class="card"><h3 style="margin-top:0">${isC?(E.id?"코스 수정":"다녀온 행사 코스 등록"):(E.id?"내 계획 편집":"새 계획 만들기")}</h3>
   ${isC?`<p class="small muted">실제로 진행했던 일정을 그대로 적어주세요. 다른 기관이 후기와 함께 보고 복사해 갈 수 있습니다. 개인정보(담당자 이름·연락처)는 적지 마세요.</p>`:""}
@@ -470,7 +464,7 @@ async function saveEd(){
   if(!d.sido)return toast("시·도를 선택하세요");
   if(!(num(d.headcount)>0))return toast("인원을 입력하세요");
   if(d.stops.some(s=>!s.name.trim()))return toast("장소/식당명이 비어 있는 항목이 있습니다");
-  if(isC&&!canWrite())return toast("공공기관 이메일 인증 후 가능합니다");
+  if(isC&&needAff())return;
   const btn=$("#btnSave");btn.disabled=true;btn.textContent="저장 중…";
   S.lastOrg=d.orgName.trim();localStorage.setItem("lastOrg",S.lastOrg);
   try{
@@ -533,7 +527,7 @@ async function viewAdmin(){
 function render(){
   renderAuth();
   if(!CONFIGURED)return setupGuide();
-  const banner=S.user&&!S.user.emailVerified?`<div class="banner">이메일 인증이 아직 완료되지 않았습니다. 받은 메일의 링크를 누른 뒤 <button class="btn sm" data-act="reloadUser">인증 확인</button> <button class="btn sm" data-act="resend">메일 다시 받기</button></div>`:(S.user&&S.user.emailVerified&&!domainOk(S.user.email)&&!isAdmin()?`<div class="banner">공공기관 이메일(${ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")})이 아니어서 열람만 가능합니다.</div>`:"");
+  const banner="";
   const v=S.view;
   if(v==="find"){viewFind()}else if(v==="edit"||v==="planedit"){viewEdit()}else if(v==="plans"){viewPlans()}else if(v==="admin"){viewAdmin()}
   if(banner)$("#view").insertAdjacentHTML("afterbegin",banner);
@@ -547,16 +541,6 @@ const H={
   ovClick:(t,e)=>{if(e.target===t)closeModal()},
   logout:async()=>{await signOut(auth);toast("로그아웃되었습니다")},
   google:async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());closeModal()}catch(e){toast(authErr(e))}},
-  emailLogin:async()=>{try{await signInWithEmailAndPassword(auth,$("#lgEmail").value.trim(),$("#lgPw").value);closeModal()}catch(e){toast(authErr(e))}},
-  emailSignup:async()=>{
-    const em=$("#lgEmail").value.trim(),pw=$("#lgPw").value;
-    if(!domainOk(em))return toast("공공기관 이메일("+ALLOWED_DOMAINS.map(x=>"@"+x).join(", ")+")만 가입할 수 있습니다",4000);
-    if(pw.length<8)return toast("비밀번호는 8자 이상으로 입력하세요");
-    try{const c=await createUserWithEmailAndPassword(auth,em,pw);await sendEmailVerification(c.user);closeModal();toast("인증 메일을 보냈습니다. 메일함(스팸함 포함)을 확인하세요",5000)}catch(e){toast(authErr(e))}
-  },
-  resetPw:async()=>{const em=$("#lgEmail").value.trim();if(!em)return toast("이메일을 입력하세요");try{await sendPasswordResetEmail(auth,em);toast("재설정 메일을 보냈습니다")}catch(e){toast(authErr(e))}},
-  resend:async()=>{try{await sendEmailVerification(S.user);toast("인증 메일을 다시 보냈습니다")}catch(e){toast(authErr(e))}},
-  reloadUser:async()=>{await S.user.reload();S.user=auth.currentUser;await auth.currentUser.getIdToken(true);render();toast(S.user.emailVerified?"인증이 확인되었습니다":"아직 인증되지 않았습니다")},
   more:()=>{S.shown+=30;renderList()},
   open:t=>{location.hash="c/"+t.dataset.id},
   print:()=>window.print(),
@@ -602,7 +586,7 @@ const H={
   planXlsx:t=>exportXlsx(S.plans.find(x=>x.id===t.dataset.id)),
   planDocx:t=>exportDocx(S.plans.find(x=>x.id===t.dataset.id)),
   planDel:async t=>{if(!confirm("계획을 삭제할까요?"))return;await deleteDoc(doc(db,"plans",t.dataset.id));await loadPlans();viewPlans()},
-  planShare:t=>{const p=S.plans.find(x=>x.id===t.dataset.id);if(!canWrite())return toast("공공기관 이메일 인증 후 공유할 수 있습니다");const d={...p,title:p.title.replace(/^\[복사\]\s*/,"")};delete d.id;startEdit("course",d)},
+  planShare:t=>{const p=S.plans.find(x=>x.id===t.dataset.id);if(needAff())return;const d={...p,title:p.title.replace(/^\[복사\]\s*/,"")};delete d.id;startEdit("course",d)},
   rpOpen:t=>{location.hash="c/"+t.dataset.c},
   rpDelTarget:async t=>{
     const r=S.reports.find(x=>x.id===t.dataset.id);if(!confirm("신고 대상을 삭제할까요?"))return;
